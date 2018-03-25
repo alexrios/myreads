@@ -1,29 +1,48 @@
 import React, {Component} from 'react'
-import BookShelfChanger from './BookShelfChanger'
 import PropTypes from 'prop-types'
 
 class BookShelf extends Component {
   static propTypes = {
-      sectionName: PropTypes.string.isRequired
+      sectionName: PropTypes.string.isRequired,
+      books: PropTypes.array.isRequired,
+      updateShelf: PropTypes.func.isRequired
     }
 
-  render() {
-    const {sectionName} = this.props
+  handleChange = (shelf, book) => {
+    this.props.updateShelf(shelf, book)
+  }
 
+  render() {
+    const books = this.props.books !== undefined ? this.props.books : []
+    const sectionName = this.props.sectionName
     return <div className="bookshelf">
       <h2 className="bookshelf-title">{sectionName}</h2>
       <div className="bookshelf-books">
         <ol className="books-grid">
-          <li>
+        {books.map((book) => (
+          <li key={book.id}>
             <div className="book">
               <div className="book-top">
-                <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: 'url("http://books.google.com/books/content?id=PGR2AwAAQBAJ&printsec=frontcover&img=1&zoom=1&imgtk=AFLRE73-GnPVEyb7MOCxDzOYF1PTQRuf6nCss9LMNOSWBpxBrz8Pm2_mFtWMMg_Y1dx92HT7cUoQBeSWjs3oEztBVhUeDFQX6-tWlWz1-feexS0mlJPjotcwFqAg6hBYDXuK_bkyHD-y&source=gbs_api")' }}></div>
-                <BookShelfChanger/>
+                <div className="book-cover" style={{
+                   width: 128,
+                   height: 193,
+                   backgroundImage: `url(${book.imageLinks.smallThumbnail})`
+                 }}></div>
+                <div className="book-shelf-changer">
+                  <select value={book.shelf} onChange={(event)=> this.handleChange(event.target.value, book)}>
+                    <option value="none" disabled>Move to...</option>
+                    <option value="currentlyReading">Currently Reading</option>
+                    <option value="wantToRead">Want to Read</option>
+                    <option value="read">Read</option>
+                    <option value="none">None</option>
+                  </select>
+                </div>
               </div>
-              <div className="book-title">To Kill a Mockingbird</div>
-              <div className="book-authors">Harper Lee</div>
+              <div className="book-title">{book.title}</div>
+              <div className="book-authors">{book.authors.join(', ')}</div>
             </div>
           </li>
+        ))}
         </ol>
       </div>
    </div>
